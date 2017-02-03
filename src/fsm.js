@@ -26,7 +26,7 @@ class FSM {
     changeState(state) {
       if (state in this.config.states) {
         this.history.push(this.state);
-        this.history.pos++;
+        this.history.pos = this.history.length;
         this.state = state;
       }
       else throw console.Error();
@@ -37,7 +37,12 @@ class FSM {
      * @param event
      */
     trigger(event) {
-
+      if (event in this.config.states[this.state].transitions) {
+        this.history.push(this.state);
+        this.history.pos = this.history.length;
+        this.changeState(this.config.states[this.state].transitions[event]);
+      }
+      else throw console.Error();
     }
 
     /**
@@ -45,7 +50,6 @@ class FSM {
      */
     reset() {
       this.state = this.config.initial;
-      this.clearHistory();
     }
 
     /**
@@ -77,13 +81,12 @@ class FSM {
      */
     redo() {
       if (this.history.pos === 0) return false;
-      else if (this.history.pos === (this.history.length - 1)) return false;
+      else if (this.history.pos === this.history.length) return false;
       else {
-        this.histoty.pos++;
+        this.history.pos++;
         this.state = this.history[this.history.pos];
         return true;
       }
-
     }
 
     /**
