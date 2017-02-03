@@ -5,10 +5,10 @@ class FSM {
      */
     constructor(config) {
       if (!config) throw console.Error();
-      this.state = config.initial;
       this.config = config;
-      this.history = [];
-      this.history.pos = 0;
+      this.state = config.initial;
+      this.history = [this.state];
+      this.history.pos = 1;
     }
 
     /**
@@ -25,9 +25,9 @@ class FSM {
      */
     changeState(state) {
       if (state in this.config.states) {
+        this.state = state;
         this.history.push(this.state);
         this.history.pos = this.history.length;
-        this.state = state;
       }
       else throw console.Error();
     }
@@ -38,8 +38,6 @@ class FSM {
      */
     trigger(event) {
       if (event in this.config.states[this.state].transitions) {
-        this.history.push(this.state);
-        this.history.pos = this.history.length;
         this.changeState(this.config.states[this.state].transitions[event]);
       }
       else throw console.Error();
@@ -58,7 +56,16 @@ class FSM {
      * @param event
      * @returns {Array}
      */
-    getStates(event) {}
+    getStates(event) {
+      var array = [];
+      if (!event) {
+        return array;
+      }
+      else if (event in this.config) {
+        return array;
+      }
+      else if (!(event in this.config)) return array;
+    }
 
     /**
      * Goes back to previous state.
@@ -66,10 +73,10 @@ class FSM {
      * @returns {Boolean}
      */
     undo() {
-      if (this.history.pos === 0) return false;
+      if (this.history.pos === 1) return false;
       else {
         this.history.pos--;
-        this.state = this.history[this.history.pos];
+        this.state = this.history[this.history.pos - 1];
         return true;
       }
     }
@@ -80,11 +87,10 @@ class FSM {
      * @returns {Boolean}
      */
     redo() {
-      if (this.history.pos === 0) return false;
-      else if (this.history.pos === this.history.length) return false;
+      if (this.history.pos === this.history.length) return false;
       else {
         this.history.pos++;
-        this.state = this.history[this.history.pos];
+        this.state = this.history[this.history.pos - 1];
         return true;
       }
     }
@@ -93,8 +99,8 @@ class FSM {
      * Clears transition history
      */
     clearHistory() {
-      this.history.length = 0;
-      this.history.pos = 0;
+      this.history.length = 1;
+      this.history.pos = 1;
     }
 }
 
