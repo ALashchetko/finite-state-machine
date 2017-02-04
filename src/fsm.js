@@ -4,7 +4,7 @@ class FSM {
      * @param config
      */
     constructor(config) {
-      if (!config) throw console.Error();
+      if (!config) throw new Error();
       this.config = config;
       this.state = config.initial;
       this.history = [this.state];
@@ -29,7 +29,7 @@ class FSM {
         this.history.push(this.state);
         this.history.pos = this.history.length;
       }
-      else throw console.Error();
+      else throw new Error();
     }
 
     /**
@@ -40,7 +40,7 @@ class FSM {
       if (event in this.config.states[this.state].transitions) {
         this.changeState(this.config.states[this.state].transitions[event]);
       }
-      else throw console.Error();
+      else throw new Error();
     }
 
     /**
@@ -59,12 +59,13 @@ class FSM {
     getStates(event) {
       var array = [];
       if (!event) {
+        return Object.keys(this.config.states);
+      }
+      else {
+        for (var stateKey in this.config.states)
+            if (this.config.states[stateKey].transitions[event]) array.push(stateKey);
         return array;
       }
-      else if (event in this.config) {
-        return array;
-      }
-      else if (!(event in this.config)) return array;
     }
 
     /**
@@ -73,12 +74,12 @@ class FSM {
      * @returns {Boolean}
      */
     undo() {
-      if (this.history.pos === 1) return false;
-      else {
+      if (this.history.pos != 1) {
         this.history.pos--;
         this.state = this.history[this.history.pos - 1];
         return true;
       }
+      return false;
     }
 
     /**
@@ -87,12 +88,12 @@ class FSM {
      * @returns {Boolean}
      */
     redo() {
-      if (this.history.pos === this.history.length) return false;
-      else {
+      if (this.history.pos != this.history.length) {
         this.history.pos++;
         this.state = this.history[this.history.pos - 1];
         return true;
       }
+      return false;
     }
 
     /**
