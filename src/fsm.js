@@ -27,7 +27,8 @@ class FSM {
       if (state in this.config.states) {
         this.state = state;
         this.history.push(this.state);
-        this.history.pos = this.history.length;
+        this.history.pos++;
+        this.history.length = this.history.pos;
       }
       else throw new Error();
     }
